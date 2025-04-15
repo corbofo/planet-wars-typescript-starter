@@ -18,6 +18,7 @@ export class ClientInfo {
 
   public kill(): void {
     if (this.client !== null) {
+      this.playerIOManager.close();
       this.client.kill();
       this.client = null;
     }

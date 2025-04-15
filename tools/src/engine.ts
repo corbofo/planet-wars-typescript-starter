@@ -17,21 +17,12 @@ import { readFileSync, writeFileSync } from "fs";
 import { ClientInfo } from "./clientInfo";
 import { Game } from "./game";
 
-function KillClients(clients: ChildProcessWithoutNullStreams[]) {
+function KillClients(clients: ClientInfo[]) {
   for (const p of clients) {
     if (p != null) {
       p.kill();
     }
   }
-}
-
-function AllTrue(v: boolean[]): boolean {
-  for (let i = 0; i < v.length; ++i) {
-    if (!v[i]) {
-      return false;
-    }
-  }
-  return true;
 }
 
 async function main(args: string[]) {
@@ -71,7 +62,7 @@ async function main(args: string[]) {
       client = null;
     }
     if (client === null) {
-      KillClients(clients.map((c) => c.getClient()));
+      KillClients(clients);
       process.stderr.write("ERROR: failed to start client: " + command + "\n");
       process.exit(1);
     }
@@ -121,7 +112,7 @@ async function main(args: string[]) {
     fullPlayback += intermediatePlaybackString;
     game.DoTimeStep();
   }
-  KillClients(clients.map((c) => c.getClient()));
+  KillClients(clients);
   if (game.Winner() > 0) {
     process.stderr.write("Player " + game.Winner() + " Wins!" + "\n");
   } else {
@@ -131,6 +122,7 @@ async function main(args: string[]) {
   process.stdout.write(playbackString + "\n");
   fullPlayback += playbackString;
   updateFightHtmlVisualisation(fullPlayback);
+  process.exit(0);
 }
 
 function updateFightHtmlVisualisation(fullPlayback: string) {
